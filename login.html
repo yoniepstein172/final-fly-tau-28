@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<div class="main-box">
+{% if error %}
+  <div class="error-message">
+    {{ error }}
+  </div>
+{% endif %}
+
+    <h2 class="page-title">Welcome Back</h2>
+
+    <form method="post">
+
+        <input type="text"
+               name="email"
+               placeholder="Email"
+               required>
+
+        <input type="password"
+               name="password"
+               placeholder="Password"
+               required>
+
+        <button type="submit" class="action-box">
+            Login
+        </button>
+
+    </form>
+</div>
+
+<div class="manager-login-outside">
+  <a href="{{ url_for('manager_login') }}" class="manager-link">
+    Manager Login
+  </a>
+</div>
+
+
+{% endblock %}

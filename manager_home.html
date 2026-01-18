@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Manager Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-card">
+
+  <h2 class="page-title">Hello Manager</h2>
+
+  <p class="dashboard-subtitle">
+    Choose an action
+  </p>
+
+  <div class="manager-actions">
+
+    <a href="/manager/add-flight" class="manager-action">
+      Add Flight
+    </a>
+
+    <a href="/manager/add-route" class="manager-action">
+      Add Route
+    </a>
+
+    <a href="/manager/cancel-flight" class="manager-action">
+      Cancel Flight
+    </a>
+
+    <a href="/manager/search-board" class="manager-action">
+        Search Flight Board
+    </a>
+
+    <a href="/manager/add-crew" class="manager-action">
+      Add Crew Members
+    </a>
+
+    <a href="/manager/add-aircraft" class="manager-action">
+      Add AirCraft
+    </a>
+
+    <a href="/manager/reports" class="manager-action">
+      Statistics & Reports
+    </a>
+
+  </div>
+
+</div>
+
+{% endblock %}
