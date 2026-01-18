@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}Add Flight{% endblock %}
+{% block content %}
+
+<div class="dashboard-card wide-box">
+
+  <h2 class="page-title">Add New Flight</h2>
+
+  {% if error %}
+    <div class="error-message">{{ error }}</div>
+  {% endif %}
+
+  <!-- ================= STEP 1 ================= -->
+  {% if step == "1" %}
+
+  <form method="post" class="card-form">
+
+    <input type="hidden" name="step" value="1">
+
+    <div class="section-card">
+      <div class="section-title">Flight Details</div>
+
+      <div class="form-grid">
+
+        <div>
+          <label class="field-label">Departure Date</label>
+          <input type="date" name="departure_date" class="form-input" required>
+        </div>
+
+        <div>
+          <label class="field-label">Departure Time</label>
+          <input type="time" name="departure_time" class="form-input" required>
+        </div>
+
+        <div class="span-2">
+          <label class="field-label">Route (From → To)</label>
+          <select name="r_id" class="form-input" required>
+            <option value="" disabled selected>Select route</option>
+            {% for r in routes %}
+              <option value="{{ r.R_ID }}">
+                {{ r.Airport_Source }} → {{ r.Destination }} ({{ r.Duration }})
+              </option>
+            {% endfor %}
+          </select>
+          <div class="form-hint">
+            Arrival date & time will be calculated automatically
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button type="submit" class="action-box">
+        Check Availability →
+      </button>
+    </div>
+              <a href="/manager/home" class="secondary-button">
+        ← Back to Manager Home
+      </a>
+  </form>
+
+  {% endif %}
+
+  <!-- ================= STEP 2 ================= -->
+  {% if step == "2" %}
+  <form method="post" class="card-form">
+
+    <input type="hidden" name="step" value="2">
+    <input type="hidden" name="duration" value="{{ route.Duration }}">
+    <input type="hidden" name="r_id" value="{{ r_id }}">
+    <input type="hidden" name="dep_datetime" value="{{ dep_datetime.isoformat() }}">
+    <input type="hidden" name="arr_datetime" value="{{ arrival_datetime.isoformat() }}">
+
+    <!-- Summary -->
+    <div class="section-card">
+      <div class="section-title">Flight Summary</div>
+      <p><b>Route:</b> {{ route.Airport_Source }} → {{ route.Destination }}</p>
+      <p><b>Departure:</b> {{ dep_datetime }}</p>
+      <p><b>Arrival:</b> {{ arrival_datetime }}</p>
+      <p><b>Duration:</b> {{ route.Duration }}</p>
+    </div>
+
+    <!-- Pricing -->
+<div class="section-card">
+  <div class="section-title">Ticket Pricing</div>
+
+  <div class="form-grid">
+
+    <div>
+      <label class="field-label">Economy Price ($)</label>
+      <input
+        type="number"
+        name="price_economy"
+        class="form-input"
+        min="0"
+        required>
+    </div>
+
+    <div>
+      <label class="field-label">Business Price ($)</label>
+      <input
+        type="number"
+        name="price_business"
+        id="business-price"
+        class="form-input"
+        min="0"
+        value="0">
+      <div class="form-hint">
+        Business price is available only if the aircraft includes business class.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+    <!-- Aircraft -->
+    <div class="section-card">
+      <div class="section-title">Aircraft Assignment</div>
+
+      <select name="ac_id" class="form-input" required
+        onchange="handleAircraftChange(this)">
+        <option value="" disabled selected>Select aircraft</option>
+        {% for ac in aircrafts %}
+          <option value="{{ ac.AC_ID }}"
+            data-business="{{ ac.Capacity_Business }}">
+            {{ ac.AC_ID }} — {{ ac.Size }} | {{ ac.Manufactur }}
+            (Biz {{ ac.Capacity_Business }}, Eco {{ ac.Capacity_Economy }})
+          </option>
+        {% endfor %}
+      </select>
+
+      {% if not aircrafts %}
+        <div class="empty-note">No available aircraft</div>
+      {% endif %}
+    </div>
+
+    <!-- Crew -->
+    <div class="section-card">
+      <div class="section-title">Crew Selection</div>
+           <div class="form-note">
+  ✈️ <strong>Crew Rules:</strong><br>
+  • <b>Large aircraft</b>: 3 pilots & 6 flight attendants<br>
+  • <b>Standard aircraft</b>: 2 pilots & 3 flight attendants<br>
+  <br>
+  The final validation is enforced by the system.
+</div>
+
+
+      <div class="crew-grid">
+
+        <div class="crew-box">
+          <h4>Choose Pilots</h4>
+          {% for p in pilots %}
+            <label class="pill">
+              <input type="checkbox" name="pilots" value="{{ p.P_ID }}">
+              {{ p.First_Name_H }} {{ p.Last_Name_H }}
+              {% if p.Is_Qualified %}
+                <span class="tag tag-good">Qualified</span>
+              {% endif %}
+            </label>
+          {% endfor %}
+        </div>
+
+        <div class="crew-box">
+          <h4>Choose Flight Attendants</h4>
+          {% for fa in attendants %}
+            <label class="pill">
+              <input type="checkbox" name="attendants" value="{{ fa.FA_ID }}">
+              {{ fa.First_Name_H }} {{ fa.Last_Name_H }}
+              {% if fa.Is_Qualified %}
+                <span class="tag tag-good">Qualified</span>
+              {% endif %}
+            </label>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button type="submit" class="action-box">Add Flight</button>
+      <a href="/manager/home" class="secondary-button">← Back</a>
+    </div>
+  </form>
+
+  {% endif %}
+
+</div>
+<script>
+function handleAircraftChange(select) {
+  const businessCap = parseInt(
+    select.options[select.selectedIndex].dataset.business
+  );
+
+  const businessPriceInput = document.getElementById("business-price");
+
+  if (businessCap === 0) {
+    businessPriceInput.value = 0;
+    businessPriceInput.readOnly = true;
+  } else {
+    businessPriceInput.readOnly = false;
+  }
+}
+</script>
+
+
+{% endblock %}

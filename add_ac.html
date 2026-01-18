@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="dashboard-card">
+
+    <h2 class="page-title">Add Aircraft</h2>
+    <p class="dashboard-subtitle">
+        Register a new aircraft in the system
+    </p>
+
+    {% if error %}
+        <div class="error-message">{{ error }}</div>
+    {% endif %}
+
+    {% if success %}
+        <div class="success-message">{{ success }}</div>
+    {% endif %}
+
+    <form method="post">
+
+        <label class="field-label">Aircraft ID</label>
+        <input
+            type="text"
+            name="ac_id"
+            class="form-input"
+            required
+            placeholder="AC123"
+        >
+
+<label class="field-label">Aircraft Size</label>
+<select
+    name="size"
+    id="size-select"
+    class="form-input"
+    required
+    onchange="handleSizeChange()">
+
+    <option value="" disabled selected>Select size</option>
+    <option value="Small">Small</option>
+    <option value="Large">Large</option>
+</select>
+
+
+        <label class="field-label">Manufacturer</label>
+        <select name="manufactur" class="form-input" required>
+            <option value="" disabled selected>Select manufacturer</option>
+            <option value="Boeing">Boeing</option>
+            <option value="Airbus">Airbus</option>
+            <option value="Dassault">Dassault</option>
+        </select>
+
+<label class="field-label">Business Capacity</label>
+    <input
+      class="form-input"
+      type="number"
+      name="capacity_business"
+      id="business-capacity"
+      min="0"
+      value="0"
+      readonly
+      required>
+
+        <label class="field-label">Economy Capacity</label>
+        <input
+            type="number"
+            name="capacity_economy"
+            class="form-input"
+            min="0"
+            required>
+
+        <label class="field-label">Purchased Date</label>
+        <input
+            type="date"
+            name="purchased_date"
+            class="form-input"
+            required>
+
+        <button type="submit" class="action-box">
+            Add Aircraft
+        </button>
+              <a href="/manager/home" class="secondary-button">
+        ← Back to Manager Home
+      </a>
+
+    </form>
+
+</div>
+<script>
+function handleSizeChange() {
+  const size = document.getElementById("size-select").value;
+  const businessInput = document.getElementById("business-capacity");
+
+  if (size === "Small") {
+    businessInput.value = 0;
+    businessInput.readOnly = true;
+  } else if (size === "Large") {
+    businessInput.readOnly = false;
+  }
+}
+</script>
+{% endblock %}

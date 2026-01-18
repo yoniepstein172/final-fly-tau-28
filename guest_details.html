@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Guest Details</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+<div class="main-box">
+
+<h2 class="page-title">Guest Details</h2>
+
+<form method="POST">
+
+  <label class="field-label">First Name (English)</label>
+  <input class="form-input" type="text" name="first_name" required>
+
+  <label class="field-label">Last Name (English)</label>
+  <input class="form-input" type="text" name="last_name" required>
+
+  <label class="field-label">Email</label>
+  <input class="form-input" type="email" name="email" required>
+
+<label class="field-label">Phone Numbers</label>
+
+  <div id="phones-container">
+    <input
+      type="text"
+      name="phones[]"
+      class="form-input"
+      placeholder="Phone number"
+      required>
+  </div>
+
+  <button
+    type="button"
+    class="secondary-button"
+    onclick="addPhone()">
+    + Add another phone
+  </button>
+
+  <br><br>
+
+  <button class="action-box" type="submit">
+    PURCHASE
+  </button>
+
+</form>
+
+</div>
+<script>
+function addPhone() {
+  const container = document.getElementById("phones-container");
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.name = "phones[]";
+  input.className = "form-input";
+  input.placeholder = "Phone number";
+
+  container.appendChild(input);
+}
+</script>
+
+</body>
+</html>

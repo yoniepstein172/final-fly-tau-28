@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Cancel Flight{% endblock %}
+{% block content %}
+
+<div class="dashboard-card wide-box">
+
+    <h2 class="page-title">Cancel Flight</h2>
+
+
+  {% if error %}
+    <div class="error-message">{{ error }}</div>
+  {% endif %}
+
+  {% if success %}
+    <div class="success-message">{{ success }}</div>
+  {% endif %}
+
+  <form method="post" class="card-form">
+
+    <div class="section-card">
+      <div class="section-title">Select Flight to Cancel</div>
+
+      <label class="field-label">Active Flights</label>
+      <select name="flight_number" class="form-input" required>
+        <option value="" disabled selected>Select flight</option>
+        {% for f in flights %}
+          <option value="{{ f.Flight_Number }}">
+            {{ f.Flight_Number }} —
+            {{ f.Departure_Date }} {{ f.Departure_Time }}
+          </option>
+        {% endfor %}
+      </select>
+
+      {% if not flights %}
+        <div class="empty-note">
+          No active flights available for cancellation.
+        </div>
+      {% endif %}
+    </div>
+
+<div class="warning-title">
+  ⚠ <strong>This action will:</strong>
+
+<ul class="cancel-info">
+    <li>Cancel the flight</li>
+    <li>Cancel all customer orders (System Cancelation)</li>
+    <li>Set order price to 0$</li>
+    <li>Release all assigned crew members</li>
+</ul>
+
+      Flight can be canceled only up to <b>72 hours before departure</b>.
+    </div>
+      <button type="submit" class="action-box danger">
+        Cancel Flight
+      </button>
+
+    <div class="actions-row">
+      <a href="/manager/home" class="secondary-button">
+        ← Back to Manager Home
+      </a>
+
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

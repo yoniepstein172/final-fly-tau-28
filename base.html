@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>{% block title %}FLYTAU{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% if session.role %}
+  <div class="logout-nav">
+    <a href="/logout" class="secondary-button">Logout</a>
+  </div>
+{% endif %}
+
+    <!-- Home button (appears on every page) -->
+<div class="home-nav">
+  <a href="/" class="home-link">🏠 Home</a>
+</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="{{ category }}-message">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endwith %}
+
+
+
+    {% block content %}{% endblock %}
+
+</body>
+</html>

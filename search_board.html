@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <h2 class="page-title">Flight Search Board </h2>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="main-box wide-box">
+
+
+    <!--  Search Form -->
+    <form method="POST" class="search-bar">
+
+    <input class="input-field"
+           type="text"
+           name="source"
+           placeholder="From (CITY-AIRPORT)">
+
+    <input class="input-field"
+           type="text"
+           name="destination"
+           placeholder="To (CITY-AIRPORT)">
+
+    <input class="input-field"
+           type="date"
+           name="date">
+
+    <select class="input-field" name="status">
+        <option value="">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="Canceled">Canceled</option>
+        <option value="Completed">Completed</option>
+    </select>
+
+    <button type="submit" class="action-box small">
+        Search
+    </button>
+
+</form>
+
+    <!--  Flight Board -->
+   <table class="flight-table">
+
+    <thead>
+        <tr>
+            <th>Flight #</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Date</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for flight in flights %}
+        <tr>
+            <td>{{ flight.Flight_Number }}</td>
+            <td>{{ flight.Airport_Source }}</td>
+            <td>{{ flight.Destination }}</td>
+            <td>{{ flight.Departure_Date }}</td>
+            <td>{{ flight.Departure_Time }}</td>
+            <td>{{ flight.Arrival_Time }}</td>
+            <td>{{ flight.Status }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="empty-row">
+                No flights found ✈️
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+              <a href="/manager/home" class="secondary-button">
+        ← Back to Manager Home
+      </a>
+
+</div>
+
+</body>
+</html>

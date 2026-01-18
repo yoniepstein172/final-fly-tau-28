@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Flight{% endblock %}
+
+{% block content %}
+<div class="main-box">
+
+    <h2 class="page-title">Choose Your Flight</h2>
+
+    <form method="get" action="/flights-results" class="search-form">
+
+        <input type="date" name="date" required>
+
+        <select name="from_city" required>
+            <option value="" disabled selected>From</option>
+            {% for city in cities %}
+                <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="to_city" required>
+            <option value="" disabled selected>To</option>
+            {% for city in cities %}
+                <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- כפתור חיפוש -->
+        <button type="submit" class="action-box">
+            Search Flights
+        </button>
+    </form>
+
+<div class="secondary-actions">
+    <div class="secondary-action">
+        <a href="/flight-board" class="secondary-button">
+            View Flight Board
+        </a>
+    </div>
+
+    <div class="secondary-action">
+        <a href="/guest/my-order" class="secondary-button outline">
+            View My Order
+        </a>
+    </div>
+</div>
+
+{% endblock %}

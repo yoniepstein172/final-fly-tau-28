@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+
+<div class="hero">
+  <div class="hero-overlay">
+
+    <div class="hero-card">
+
+      <!-- BOX 1: LOGO -->
+      <div class="logo-box">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+      </div>
+
+      <!-- BOX 2: TEXT + ACTIONS -->
+      <div class="action-box-wrapper">
+        <p class="hero-subtitle">Your Route to Success</p>
+
+        <a href="/login" class="action-box">Login</a>
+        <a href="/register" class="action-box">Register</a>
+        <a href="/guest" class="action-box guest">Continue as Guest</a>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

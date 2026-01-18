@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="dashboard-card">
+
+    <h2 class="page-title">Add Crew Member</h2>
+
+    {% if error %}
+        <div class="error-message">{{ error }}</div>
+    {% endif %}
+
+    {% if success %}
+        <div class="success-message">{{ success }}</div>
+    {% endif %}
+
+    <form method="post">
+
+        <!-- סוג עובד -->
+        <select name="employee_type" class="form-input" required>
+            <option value="" disabled selected>Employee Type</option>
+            <option value="Flight_Attendant">Flight Attendant</option>
+            <option value="Pilot">Pilot</option>
+        </select>
+
+        <input class="form-input"
+               name="emp_id"
+               placeholder="Employee ID"
+               required>
+
+        <input class="form-input"
+               name="first_name"
+               placeholder="First Name (Hebrew)"
+               required>
+
+        <input class="form-input"
+               name="last_name"
+               placeholder="Last Name (Hebrew)"
+               required>
+
+        <input class="form-input"
+               name="phone"
+               placeholder="Phone Number"
+               required>
+
+        <label class="field-label">Started Working Date</label>
+        <input type="date"
+               name="start_date"
+               class="form-input"
+               required>
+
+        <input class="form-input"
+               name="city"
+               placeholder="City (Hebrew)"
+               required>
+
+        <input class="form-input"
+               name="street"
+               placeholder="Street (Hebrew)"
+               required>
+
+        <input class="form-input"
+               type="number"
+               name="number"
+               placeholder="House Number"
+               required>
+
+<div class="toggle-row">
+    <span class="toggle-label">Qualified Crew Member</span>
+    <input type="checkbox" name="is_qualified">
+</div>
+
+
+
+
+        <button type="submit" class="action-box">
+            Add Crew Member
+        </button>
+              <a href="/manager/home" class="secondary-button">
+        ← Back to Manager Home
+      </a>
+    </form>
+
+</div>
+
+{% endblock %}

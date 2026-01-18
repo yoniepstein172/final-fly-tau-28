@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}Manager Reports{% endblock %}
+{% block content %}
+
+<div class="dashboard-card wide-box reports-page">
+
+  <div class="reports-header">
+    <h2 class="page-title">Management Reports</h2>
+  </div>
+
+  <!-- FILTER -->
+  <div class="section-card report-filter">
+  <form method="get" class="filter-row">
+
+    <div class="filter-field">
+      <label class="field-label">Year</label>
+      <input
+        class="form-input"
+        name="year"
+        placeholder="e.g. 2026"
+        value="{{ selected_year or '' }}">
+    </div>
+
+    <div class="filter-field">
+      <label class="field-label">Month</label>
+      <input
+        class="form-input"
+        name="month"
+        placeholder="1-12"
+        value="{{ selected_month or '' }}">
+    </div>
+
+    <div class="filter-buttons">
+      <button class="action-box" type="submit">
+        Apply
+      </button>
+      <a class="secondary-button" href="/manager/reports">
+        Clear
+      </a>
+    </div>
+
+  </form>
+</div>
+
+
+  <!-- 1. Revenue -->
+  <details class="report-card" open>
+    <summary class="report-title">
+      <span>Revenue by Month</span>
+      <span class="report-hint"></span>
+    </summary>
+
+    <div class="report-body">
+      {% if revenue_report %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Month</th>
+              <th>Total Revenue ($)</th>
+              <th>Orders</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in revenue_report %}
+            <tr>
+              <td>{{ r.year }}</td>
+              <td>{{ r.month }}</td>
+              <td><b>{{ r.total_revenue }}</b></td>
+              <td>{{ r.orders_count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="empty-note">No data for this filter.</div>
+      {% endif %}
+    </div>
+  </details>
+
+  <!-- 2. Popular Routes -->
+  <details class="report-card">
+    <summary class="report-title">
+      <span>Popular Routes</span>
+      <span class="report-hint"></span>
+    </summary>
+
+    <div class="report-body">
+      {% if popular_routes %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>To</th>
+              <th>Orders</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in popular_routes %}
+            <tr>
+              <td>{{ r.Airport_Source }}</td>
+              <td>{{ r.Destination }}</td>
+              <td><b>{{ r.orders_count }}</b></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="empty-note">No data for this filter.</div>
+      {% endif %}
+    </div>
+  </details>
+
+  <!-- 3. Cancellations -->
+  <details class="report-card">
+    <summary class="report-title">
+      <span>Cancellations</span>
+      <span class="report-hint"></span>
+    </summary>
+
+    <div class="report-body">
+      {% if cancellations_report %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Month</th>
+              <th>Canceled Orders</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in cancellations_report %}
+            <tr>
+              <td>{{ c.year }}</td>
+              <td>{{ c.month }}</td>
+              <td><b>{{ c.canceled_orders }}</b></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="empty-note">No data for this filter.</div>
+      {% endif %}
+    </div>
+  </details>
+
+  <!-- 4. Orders by User Type -->
+  <details class="report-card">
+    <summary class="report-title">
+      <span>Orders by User Type</span>
+      <span class="report-hint"></span>
+    </summary>
+
+    <div class="report-body">
+      {% if orders_by_user_type %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User Type</th>
+              <th>Orders</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in orders_by_user_type %}
+            <tr>
+              <td>{{ u.User_Type }}</td>
+              <td><b>{{ u.orders_count }}</b></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="empty-note">No data for this filter.</div>
+      {% endif %}
+    </div>
+  </details>
+
+  <!-- 5. Seat Utilization -->
+  <details class="report-card">
+    <summary class="report-title">
+      <span>Seat Utilization</span>
+      <span class="report-hint"></span>
+    </summary>
+
+    <div class="report-body">
+      {% if seat_utilization %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Flight</th>
+              <th>Seats Taken</th>
+              <th>Total Seats</th>
+              <th>Utilization</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in seat_utilization %}
+            <tr>
+              <td class="mono">{{ s.Flight_Number }}</td>
+              <td>{{ s.taken_seats }}</td>
+              <td>{{ s.total_seats }}</td>
+              <td><b>{{ s.utilization_percent }}%</b></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="empty-note">No data for this filter.</div>
+      {% endif %}
+    </div>
+  </details>
+
+  <div class="reports-footer">
+    <a href="/manager/home" class="secondary-button">← Back to Manager Home</a>
+  </div>
+
+</div>
+
+{% endblock %}

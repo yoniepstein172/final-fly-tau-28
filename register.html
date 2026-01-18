@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="main-box">
+
+  <h2 class="page-title">Create Account</h2>
+
+  {% if error %}
+    <div class="error-message">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST">
+
+    <label class="field-label">Email</label>
+    <input class="form-input" type="email" name="email" required>
+
+    <label class="field-label">First Name (English)</label>
+    <input class="form-input" type="text" name="first_name" required>
+
+    <label class="field-label">Last Name (English)</label>
+    <input class="form-input" type="text" name="last_name" required>
+
+    <!-- Phones -->
+    <label class="field-label">Phone Numbers</label>
+
+    <div id="phones-container">
+      <input
+        type="text"
+        name="phones[]"
+        class="form-input"
+        placeholder="Phone number"
+        required>
+    </div>
+
+    <button
+      type="button"
+      class="secondary-button"
+      onclick="addPhone()">
+      + Add another phone
+    </button>
+
+    <br><br>
+
+    <label class="field-label">Passport Number</label>
+    <input class="form-input" type="text" name="passport" required>
+
+    <label class="field-label">Password</label>
+    <input class="form-input" type="password" name="password" required>
+
+    <label class="field-label">Birth Date</label>
+    <input class="form-input" type="date" name="birth_date" required>
+
+    <label class="field-label">Registration Date</label>
+    <input class="form-input" type="date" value="{{ today }}" readonly>
+
+    <br>
+
+    <button class="action-box" type="submit">
+      Register
+    </button>
+
+  </form>
+</div>
+
+<script>
+function addPhone() {
+  const container = document.getElementById("phones-container");
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.name = "phones[]";
+  input.className = "form-input";
+  input.placeholder = "Phone number";
+
+  container.appendChild(input);
+}
+</script>
+
+{% endblock %}

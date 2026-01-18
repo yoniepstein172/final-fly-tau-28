@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Seat Selection</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+<div class="main-box">
+
+  <!-- Flight Header -->
+  <div class="flight-header">
+    <div class="flight-details">
+      <h2 class="flight-number">
+        Flight {{ flight_info.Flight_Number[:8] }}..
+      </h2>
+      <p class="flight-route">
+        {{ flight_info.Airport_Source }} → {{ flight_info.Destination }}
+      </p>
+    </div>
+
+    <div class="flight-actions">
+  <a href="/choose-flights" class="back-button">
+    ← Back to Flights
+  </a>
+</div>
+  </div>
+
+  <h2 class="page-title">Seat Selection</h2>
+
+  <!-- Order summary -->
+  <div class="order-summary">
+    <p>Selected Seats: {{ selected_seats|length }}</p>
+    <p>
+      Total price:
+      {{
+        (selected_seats | selectattr("class","equalto","Economy") | list | length)
+        * aircraft.Price_Economy
+        +
+        (selected_seats | selectattr("class","equalto","Business") | list | length)
+        * aircraft.Price_Business
+      }} $
+    </p>
+  </div>
+
+  <!-- ================= BUSINESS ================= -->
+  {%if business_rows%}
+  <h3>Business Class</h3>
+  <div class="plane-section">
+
+  {% for row in business_rows %}
+    <div class="seat-row">
+
+      <!-- LEFT -->
+      <div class="seat-side">
+        {% for seat in row.left %}
+        {% set is_taken = (seat.row, seat.letter) in taken_set %}
+        <form method="POST" class="seat-form">
+          <input type="hidden" name="row" value="{{ seat.row }}">
+          <input type="hidden" name="letter" value="{{ seat.letter }}">
+          <input type="hidden" name="class" value="Business">
+
+          <button
+            class="seat
+              {% if seat in selected_seats %}selected{% endif %}
+              {% if is_taken %}taken{% else %}available{% endif %}"
+            {% if is_taken %}disabled{% endif %}
+          >
+            {{ seat.row }}{{ seat.letter }}
+          </button>
+        </form>
+        {% endfor %}
+      </div>
+
+      <div class="aisle"></div>
+
+      <!-- RIGHT -->
+      <div class="seat-side">
+        {% for seat in row.right %}
+        {% set is_taken = (seat.row, seat.letter) in taken_set %}
+        <form method="POST" class="seat-form">
+          <input type="hidden" name="row" value="{{ seat.row }}">
+          <input type="hidden" name="letter" value="{{ seat.letter }}">
+          <input type="hidden" name="class" value="Business">
+
+          <button
+            class="seat
+              {% if seat in selected_seats %}selected{% endif %}
+              {% if is_taken %}taken{% else %}available{% endif %}"
+            {% if is_taken %}disabled{% endif %}
+          >
+            {{ seat.row }}{{ seat.letter }}
+          </button>
+        </form>
+        {% endfor %}
+      </div>
+
+    </div>
+  {% endfor %}
+  </div>
+{%endif%}
+  <!-- ================= ECONOMY ================= -->
+  <h3>Economy Class</h3>
+  <div class="plane-section">
+
+  {% for row in economy_rows %}
+    <div class="seat-row">
+
+      <!-- LEFT -->
+      <div class="seat-side">
+        {% for seat in row.left %}
+        {% set is_taken = (seat.row, seat.letter) in taken_set %}
+        <form method="POST" class="seat-form">
+          <input type="hidden" name="row" value="{{ seat.row }}">
+          <input type="hidden" name="letter" value="{{ seat.letter }}">
+          <input type="hidden" name="class" value="Economy">
+
+          <button
+            class="seat
+              {% if seat in selected_seats %}selected{% endif %}
+              {% if is_taken %}taken{% else %}available{% endif %}"
+            {% if is_taken %}disabled{% endif %}
+          >
+            {{ seat.row }}{{ seat.letter }}
+          </button>
+        </form>
+        {% endfor %}
+      </div>
+
+      <div class="aisle"></div>
+
+      <!-- RIGHT -->
+      <div class="seat-side">
+        {% for seat in row.right %}
+        {% set is_taken = (seat.row, seat.letter) in taken_set %}
+        <form method="POST" class="seat-form">
+          <input type="hidden" name="row" value="{{ seat.row }}">
+          <input type="hidden" name="letter" value="{{ seat.letter }}">
+          <input type="hidden" name="class" value="Economy">
+
+          <button
+            class="seat
+              {% if seat in selected_seats %}selected{% endif %}
+              {% if is_taken %}taken{% else %}available{% endif %}"
+            {% if is_taken %}disabled{% endif %}
+          >
+            {{ seat.row }}{{ seat.letter }}
+          </button>
+        </form>
+        {% endfor %}
+      </div>
+
+    </div>
+  {% endfor %}
+  </div>
+
+  <!-- ORDER -->
+  <form method="GET" action="/flight/{{ flight_number }}/order-summary">
+    <button class="action-box" {% if not selected_seats %}disabled{% endif %}>
+      ORDER
+    </button>
+  </form>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="main-box">
+
+    <h2 class="page-title">Add New Route</h2>
+    <p class="form-note">
+        ⚠️ Please use the format <strong>CITY-AIRPORT</strong><br>
+        Example: <em>LONDON-LHR</em>, <em>TEL AVIV-TLV</em>
+        </p>
+
+    <form method="POST" action="/manager/add-route">
+
+        <input class="input-field"
+            type="time"
+            name="duration"
+            step="60"
+            required>
+
+        <input class="input-field"
+               type="text"
+               name="airport_source"
+               placeholder="Airport Source"
+               required>
+
+        <input class="input-field"
+               type="text"
+               name="destination"
+               placeholder="Destination"
+               required>
+
+        <button type="submit" class="action-box">
+            Add Route
+        </button>
+        <a href="/manager/home" class="secondary-button">
+        ← Back to Manager Home
+      </a>
+    </form>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manager Login</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="main-box">
+  {% if error and request.method == 'POST' %}
+  <div class="error-message">
+    {{ error }}
+  </div>
+{% endif %}
+
+  <h2 class="page-title">Manager Login</h2>
+
+  <form method="POST" action="/manager-login">
+
+
+    <label class="field-label">Manager ID</label>
+    <input
+      type="text"
+      name="manager_id"
+      class="form-input"
+      required
+      placeholder="Enter ID number"
+    >
+
+    <label class="field-label">Password</label>
+    <input
+      type="password"
+      name="password"
+      class="form-input"
+      required
+      placeholder="Enter password"
+    >
+
+<button class="action-box" type="submit">
+  LOGIN
+</button>
+
+
+  </form>
+
+                <a href="/login" class="secondary-button">
+        ← Back to Customer Login
+      </a>
+</div>
+
+
+</div>
+</body>
+</html>

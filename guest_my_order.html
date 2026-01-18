@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="dashboard-card wide-box">
+
+    <h2 class="page-title">My Order</h2>
+    {% if success %}
+        <div class="success-message">{{ success }}</div>
+    {% endif %}
+
+    {% if error %}
+        <div class="error-message">{{ error }}</div>
+    {% endif %}
+
+    {% if order %}
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Flight</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ order.O_ID }}</td>
+                    <td>{{ order.Flight_Number }}</td>
+                    <td>{{ order.Airport_Source }}</td>
+                    <td>{{ order.Destination }}</td>
+                    <td>{{ order.Departure_Date }}</td>
+                    <td class="status {{ order.Stat|lower }}">
+                        {{ order.Stat }}
+                    </td>
+                    <td>{{ order.Price }} $</td>
+
+                     <td>
+                        {% if order.Stat in ['Approved', 'Active'] %}
+                        <form method="post"
+                        action="/cancel-order/{{ order.O_ID }}"
+                        style="display:inline;">
+                    <button type="submit" class="cancel-button">
+                        Cancel
+                    </button>
+                    </form>
+                {% else %}
+                    —
+                {% endif %}
+                </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+    {% else %}
+
+
+        <form method="post" class="search-form">
+            <input class="input-field"
+                   name="order_id"
+                   placeholder="Order ID"
+                   required>
+
+            <input class="input-field"
+                   type="email"
+                   name="email"
+                   placeholder="Email"
+                   required>
+
+            <button class="action-box" type="submit">
+                View Order
+            </button>
+        </form>
+    {% endif %}
+
+</div>
+
+{% endblock %}

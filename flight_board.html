@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="board-card">
+
+    <h2 class="page-title">Flight Board</h2>
+
+    <table class="board-table">
+        <thead>
+            <tr>
+                <th>Flight</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Date</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for flight in flights %}
+            <tr>
+                <td>{{ flight.Flight_Number }}</td>
+                <td>{{ flight.Airport_Source }}</td>
+                <td>{{ flight.Destination }}</td>
+                <td>{{ flight.Departure_Date }}</td>
+                <td>{{ flight.Departure_Time }}</td>
+                <td>{{ flight.Arrival_Time }}</td>
+                <td class="status {{ flight.Status|lower }}">
+                    {{ flight.Status }}
+                    <td>
+        <a href="/flight/{{ flight.Flight_Number }}/seats"
+           class="action-box small">
+          Select Flight
+        </a>
+      </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="back-form">
+        <a href="/choose-flights" class="back-button">
+            ← Search Flights
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
