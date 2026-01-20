@@ -107,7 +107,7 @@ foreign key(AC_ID) references Air_Craft(AC_ID));
 
 CREATE TABLE F_Order
 (O_ID VARCHAR(45) NOT NULL UNIQUE,
-Stat ENUM("Active","Approved","Customer_Cancelation","System_Cancelation"),
+Stat ENUM("Completed","Approved","Customer_Cancelation","System_Cancelation"),
 User_Type ENUM("NonRegistered_Customers","Registered_Customers"),
 Order_Date Date,
 Price INT,
