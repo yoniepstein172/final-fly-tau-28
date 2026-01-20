@@ -182,7 +182,7 @@ def update_status(cursor, flight_number):
         FROM Order_seat OS
         JOIN F_Order O ON O.O_ID = OS.O_ID
         WHERE O.Flight_Number = %s
-          AND O.Stat IN ('Approved','Active')
+          AND O.Stat IN ('Approved','Completed')
     """, (flight_number,))
     taken_seats = cursor.fetchone()["taken_seats"]
 
