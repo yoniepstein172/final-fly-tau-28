@@ -277,7 +277,7 @@ def customer_home(): #homepage for registered costumer, can see all orders and c
         query += " AND O.Stat = %s"
         params.append(status)
 
-    query += " ORDER BY O.Order_Date DESC"
+    query += " ORDER BY F.Departure_Date DESC"
 
     with db_cursor() as cursor:
         cursor.execute(query, params)
