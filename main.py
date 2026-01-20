@@ -22,6 +22,7 @@ app.config.update(
 
 Session(app)
 
+#handeling possible errors and redirecting
 @app.errorhandler(404)
 def page_not_found(e):
     flash("You were redirected to the home page because the page you tried to access does not exist.", "error")
@@ -62,7 +63,7 @@ def db_cursor():
 def index():
     return render_template("index.html")
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"]) #register - availble for users who are not managers
 @block_manager
 def register():
     if request.method == "POST":
@@ -74,7 +75,7 @@ def register():
         phones = request.form.getlist("phones[]")
         birth = request.form["birth_date"]
         try:
-            with db_cursor() as cursor:
+            with db_cursor() as cursor: 
                 cursor.execute("""
                     INSERT INTO Registered_Customer
                     (R_Email, First_Name_E, Last_Name_E,
@@ -96,14 +97,14 @@ def register():
 
     return render_template("register.html",today=date.today()) #if method=get
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"]) #login - available if users who are not managers
 @block_manager
 def login():
     if request.method == "POST":
         identifier = request.form["email"]
         password = request.form["password"]
 
-        with db_cursor() as cursor:
+        with db_cursor() as cursor: #verfying data with database
             cursor.execute("""
                 SELECT *
                 FROM Manager
@@ -111,7 +112,7 @@ def login():
             """, (identifier, password))
             manager = cursor.fetchone()
 
-            if manager:
+            if manager: #saving user type
                 session["user"] = identifier
                 session["role"] = "manager"
                 return redirect("/manager/home")
@@ -123,7 +124,7 @@ def login():
             """, (identifier, password))
             customer = cursor.fetchone()
 
-            if customer:
+            if customer: #saving user type
                 session.clear()
                 session["user"] = identifier
                 session["role"] = "customer"
@@ -137,10 +138,10 @@ def logout():
     flash("You have been logged out successfully.", "success")
     return redirect("/")
 
-@app.route("/guest") #if customer ig only guest
-@block_manager
+@app.route("/guest") #if customer ig only guest #continue as guest - if no manager
+@block_manager 
 def guest_login():
-    session["role"] = "guest"
+    session["role"] = "guest" #saving user type
     return redirect("/choose-flights")
 
 
@@ -185,7 +186,7 @@ def flight_results():
 
     return render_template("flights_results.html", flights=flights)
 
-@app.route("/guest/my-order", methods=["GET", "POST"])
+@app.route("/guest/my-order", methods=["GET", "POST"]) #reviewing orders of guest by order id and mail
 def guest_my_order():
     error = None
     order = None
@@ -217,8 +218,7 @@ def guest_my_order():
         if not order:
             error="Order not found. Please check your details."
 
-    return render_template(
-        "guest_my_order.html",order=order,error=error)
+    return render_template("guest_my_order.html",order=order,error=error)
 
 @app.route("/flight-board")
 @block_manager
@@ -247,7 +247,7 @@ def flight_board():
 @app.route("/customer/home")
 @block_manager
 @login_required("customer")
-def customer_home():
+def customer_home(): #homepage for registered costumer, can see all orders and can order a new flight
     with db_cursor() as cursor:
         update_all_flights_status(cursor)
     email = session["user"]
@@ -291,7 +291,7 @@ def customer_home():
 
 @app.route("/flight/<flight_number>/seats", methods=["GET", "POST"])
 @block_manager
-def seat_selection(flight_number):
+def seat_selection(flight_number): #selecting seats in aircraft drawing, deviding into taken seats and free seats
 
     if session.get("current_flight") != flight_number:
         session["current_flight"] = flight_number
@@ -372,7 +372,7 @@ def seat_selection(flight_number):
         """, (aircraft["AC_ID"],))
         all_seats = cursor.fetchall()
 
-    # build rows
+    # build rows dividing into business and economy
     business_seats = []
     economy_seats = []
 
@@ -404,7 +404,7 @@ def seat_selection(flight_number):
 
 @app.route("/flight/<flight_number>/order-summary", methods=["GET"])
 @block_manager
-def order_summary(flight_number):
+def order_summary(flight_number): #order summary - for customer to confirm
     selected_seats = session.get("selected_seats", [])
     if not selected_seats:
         return redirect(f"/flight/{flight_number}/seats")
@@ -446,17 +446,17 @@ def order_summary(flight_number):
 
 @app.route("/Confirmation")
 @block_manager
-def confirmation():
+def confirmation(): 
     role = session.get("role")
     if role == "guest":
         return redirect("/guest-details")
     elif role == "customer":
         return redirect("/purchase")
 
-@app.route("/guest-details", methods=["GET", "POST"])
+@app.route("/guest-details", methods=["GET", "POST"]) #entering guest details to save new order
 @block_manager
-def guest_details():
-
+def guest_details(): 
+    #checking if guest already oredered in past
     if request.method == "POST":
         first_name = request.form["first_name"]
         last_name = request.form["last_name"]
@@ -469,7 +469,8 @@ def guest_details():
                             WHERE Email = %s
                         """, (email,))
             exists = cursor.fetchone()
-            if not exists:
+            #if guest didn't order in the past insert into DB
+            if not exists: 
                 cursor.execute("""
                      INSERT INTO NonRegistered_Customer
                      (Email, First_Name_E, Last_Name_E)
@@ -498,7 +499,7 @@ def guest_details():
     return render_template("guest_details.html")
 
 
-@app.route("/purchase")
+@app.route("/purchase") #final purchase and saving data to DB
 @block_manager
 def purchase():
     selected_seats = session.get("selected_seats", [])
@@ -511,7 +512,7 @@ def purchase():
     with (db_cursor() as cursor):
         order_id = str(uuid.uuid4())
 
-        if role == "customer":
+        if role == "customer": #if registered entering to DB new oreder with customer deatils
             email = session["user"]
 
             cursor.execute("""
@@ -519,12 +520,12 @@ def purchase():
                 (O_ID, Stat, Order_Date, Price, User_Type, R_Email, Flight_Number)
                 VALUES (%s, 'Approved', CURDATE(), %s, 'Registered_Customers', %s, %s)
             """, (order_id, session["total_price"], email, flight_number))
-        else:
+        else: #guest -either info is set from previous order or redirecting to fill details
             guest = session.get("guest_info")
             if not guest:
                 return redirect("/guest-details")
 
-            # check if guest already exists
+            #entering data to DB
             cursor.execute("""
                 SELECT 1
                 FROM NonRegistered_Customer
@@ -559,7 +560,7 @@ def purchase():
                 VALUES (%s, 'Approved', CURDATE(), %s, 'NonRegistered_Customers', %s, %s)
             """, (order_id, session["total_price"], guest["email"], flight_number))
 
-#איפה משתמשים בזה?
+
         for seat in selected_seats:
             cursor.execute(
                 "SELECT COUNT(*) AS cnt FROM Seat WHERE AC_ID = %s",
@@ -589,7 +590,7 @@ def purchase():
         return redirect("/order-confirmation")
 
 @app.route("/order-confirmation")
-@block_manager
+@block_manager #order is made and confirmed with order id
 def order_confirmation():
     order_id = session.get("order_id")
     customer_name = session.get("customer_name")
@@ -604,12 +605,12 @@ def order_confirmation():
 
 
 @app.route("/manager-login", methods=["GET", "POST"])
-def manager_login():
+def manager_login(): #manager log in with id and password from DB
     if request.method == "POST":
         manager_id = request.form["manager_id"]
         password = request.form["password"]
 
-        with db_cursor() as cursor:
+        with db_cursor() as cursor: #checking if details are correct
             cursor.execute("""
                 SELECT M_ID
                 FROM Manager
@@ -637,7 +638,7 @@ def manager_home():
 def add_flight():
     step = request.form.get("step", "1")
 
-    with db_cursor() as cursor:
+    with db_cursor() as cursor: #first step = entering route from DB
         if request.method == "GET":
             cursor.execute("""
                 SELECT R_ID, Airport_Source, Destination, Duration
@@ -654,7 +655,7 @@ def add_flight():
             dep_date = request.form["departure_date"]      # yyyy-mm-dd
             dep_time = request.form["departure_time"]      # HH:MM
 
-            if check_valid_date(dep_date, dep_time):
+            if check_valid_date(dep_date, dep_time): #flight in future
                 flash("You cannot create a flight in the past.", "error")
                 return redirect("/manager/add-flight")
             # Route info
@@ -676,11 +677,11 @@ def add_flight():
             rest_before = dep_datetime - timedelta(days=5)
             rest_after = arrival_datetime + timedelta(days=5)
 
-            # long flight = מעל 6 שעות
+            # long flight 
             long_flight = hours > 6
             need_qualified= 1 if long_flight else 0
 
-
+#making sure only availble aircrafts will be showen - qualification, time and airport are considered
             aircraft_query = """
             SELECT AC.*
             FROM Air_Craft AC
@@ -761,7 +762,7 @@ def add_flight():
 
             min_rest_date =dep_datetime.date() - timedelta(days=5)
 
-
+#making sure only availble pilots will be showen - qualification, time and airport are considered
             # pilots
             cursor.execute("""
             SELECT P.*
@@ -829,6 +830,7 @@ def add_flight():
             ))
             pilots = cursor.fetchall()
 
+            #making sure only availble attendents will be showen - qualification, time and airport are considered
             # attendants
             cursor.execute("""
             SELECT FA.*
@@ -911,7 +913,7 @@ AND (
                 pilots=pilots,
                 attendants=attendants)
 
-        if step == "2":
+        if step == "2": 
             duration = request.form["duration"]
             flight_number = str(uuid.uuid4())
             r_id = request.form["r_id"]
@@ -940,22 +942,22 @@ AND (
                 WHERE AC_ID = %s
             """, (ac_id,))
             aircraft = cursor.fetchone()
-            price_economy = int(request.form["price_economy"])
+            price_economy = int(request.form["price_economy"]) #entering price
             if aircraft["Capacity_Business"] == 0:
-                price_business = 0
+                price_business = 0 #if no business - no bisuness price
             else:
                 price_business = int(request.form["price_business"])
 
             pilots = request.form.getlist("pilots")
             attendants = request.form.getlist("attendants")
-            if len(pilots) != pilot_count:
+            if len(pilots) != pilot_count: #making sure exact amount of pilots
                 flash(f"You must select exactly {pilot_count} pilots.", "error")
                 return redirect("/manager/add-flight")
 
-            if len(attendants) != fa_count:
+            if len(attendants) != fa_count: #making sure exact amount of atendents
                 flash(f"You must select exactly {fa_count} attendants.", "error")
                 return redirect("/manager/add-flight")
-
+#inserting details
             cursor.execute("""
                 INSERT INTO Flight
                 (Flight_Number, R_ID, Duration, AC_ID,
@@ -1027,7 +1029,7 @@ def cancel_flight():
     flights = []
     with db_cursor() as cursor:
 
-        if request.method == "GET":
+        if request.method == "GET": #only active flights can be canceled
             cursor.execute("""
                 SELECT Flight_Number, Departure_Date, Departure_Time
                 FROM Flight
@@ -1195,7 +1197,7 @@ def add_aircraft():
         manufactur = request.form["manufactur"]
         cap_economy = request.form["capacity_economy"]
         if size=="Small":
-            cap_business=0
+            cap_business=0 #no business in small aircraft
         else:
             cap_business = int(request.form["capacity_business"])
         cap_economy = request.form["capacity_economy"]
