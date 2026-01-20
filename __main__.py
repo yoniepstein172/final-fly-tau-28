@@ -1241,7 +1241,7 @@ def manager_reports():
                 SUM(Price) AS total_revenue,
                 COUNT(*) AS orders_count
             FROM F_Order
-            WHERE Stat IN ('Approved','Active')
+            WHERE Stat IN ('Approved','Completed')
         """
 
         params = []
@@ -1270,7 +1270,7 @@ def manager_reports():
             JOIN Flight F ON F.R_ID = R.R_ID
             LEFT JOIN F_Order O
               ON O.Flight_Number = F.Flight_Number
-             AND O.Stat IN ('Approved','Active')
+             AND O.Stat IN ('Approved','Completed')
         """
         params = []
 
@@ -1393,7 +1393,7 @@ def cancel_order(order_id):
         """, (order_id,))
         order = cursor.fetchone()
 
-        if not order or order["Stat"] not in ("Approved", "Active"):
+        if not order or order["Stat"] not in ("Approved", "Completed"):
             flash("This order cannot be canceled.", "error")
             return redirect("/")
 
