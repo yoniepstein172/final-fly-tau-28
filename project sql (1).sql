@@ -22,49 +22,49 @@ DROP TABLE IF EXISTS Flight_Attendant;
 -- =============================================
 
 CREATE TABLE Flight_Attendant
-( FA_ID VARCHAR(45) NOT NULL UNIQUE, 
+( FA_ID VARCHAR(45) NOT NULL UNIQUE,
 First_Name_H VARCHAR(45),
 Last_Name_H VARCHAR(45),
-Phone_Number VARCHAR(45), 
-Started_Working_Date DATE, 
-Address_City VARCHAR(45), 
+Phone_Number VARCHAR(45),
+Started_Working_Date DATE,
+Address_City VARCHAR(45),
 Address_Street VARCHAR(45),
 Address_Number INT,
 Is_Qualified boolean,
 primary key(FA_ID));
 
 CREATE TABLE Pilot
-( P_ID VARCHAR(45) NOT NULL UNIQUE, 
+( P_ID VARCHAR(45) NOT NULL UNIQUE,
 First_Name_H VARCHAR(45),
 Last_Name_H VARCHAR(45),
-Phone_Number VARCHAR(45), 
-Started_Working_Date DATE, 
-Address_City VARCHAR(45), 
+Phone_Number VARCHAR(45),
+Started_Working_Date DATE,
+Address_City VARCHAR(45),
 Address_Street VARCHAR(45),
 Address_Number INT,
 Is_Qualified BOOL,
 primary key(P_ID));
 
 CREATE TABLE Manager
-( M_ID VARCHAR(45) NOT NULL UNIQUE, 
+( M_ID VARCHAR(45) NOT NULL UNIQUE,
 First_Name_H VARCHAR(45),
 Last_Name_H VARCHAR(45),
-Phone_Number VARCHAR(45), 
-Started_Working_Date DATE, 
-Address_City VARCHAR(45), 
+Phone_Number VARCHAR(45),
+Started_Working_Date DATE,
+Address_City VARCHAR(45),
 Address_Street VARCHAR(45),
 Address_Number INT,
 M_Password VARCHAR(45),
 primary key(M_ID));
 
 CREATE TABLE NonRegistered_Customer
-( Email VARCHAR(45) NOT NULL UNIQUE, 
+( Email VARCHAR(45) NOT NULL UNIQUE,
 First_Name_E VARCHAR(45),
 Last_Name_E VARCHAR(45),
 primary key( Email));
 
-CREATE TABLE Registered_Customer 
-( R_Email VARCHAR(45) NOT NULL UNIQUE, 
+CREATE TABLE Registered_Customer
+( R_Email VARCHAR(45) NOT NULL UNIQUE,
 First_Name_E VARCHAR(45),
 Last_Name_E VARCHAR(45),
 Passport_Num VARCHAR(45),
@@ -90,12 +90,12 @@ Purchased_DATE DATE,
 primary key(AC_ID));
 
 CREATE TABLE Flight
-(Flight_Number VARCHAR(45) NOT NULL UNIQUE, 
+(Flight_Number VARCHAR(45) NOT NULL UNIQUE,
 Departure_Date DATE,
 Departure_TIME TIME,
 Status ENUM("Active", "Full_Flight","Completed","Canceled"),
 Price_Economy INT,
-Price_Business INT, 
+Price_Business INT,
 R_ID VARCHAR(45),
 Duration TIME,
 Arrival_Date DATE,
@@ -181,7 +181,7 @@ INSERT INTO Registered_Customer VALUES
 ('reg2@mail.com','Bob','Green','P456','2021-06-01','1990-03-03','pw2'),
 ('reg3@mail.com','Charlie','White','P789','2023-03-01','1998-09-09','pw3');
 
--- Phone numbers 
+-- Phone numbers
 INSERT INTO Phone_Numbers_NonRegistered_Customers VALUES
 ('guest1@mail.com','0509000001'),
 ('guest2@mail.com','0509000002');
@@ -237,7 +237,5 @@ INSERT INTO Air_Craft VALUES
 ('AC5','Large','Airbus',25,220,'2017-01-01'),
 ('AC6','Small','Boeing',0,100,'2022-01-01');
 
-UPDATE F_Order
-SET Stat = 'Completed'
-WHERE Stat = 'Active';
+
 
