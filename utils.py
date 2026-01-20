@@ -156,19 +156,29 @@ def update_status(cursor, flight_number): #update flight status after date has p
         seconds = total_seconds % 60
         arrival_time = time(hours, minutes, seconds)
 
-    arrival_dt = datetime.combine(
-        flight["Arrival_Date"],
-        arrival_time
-    )
+    dep_time = flight["Departure_Time"]
 
-    if arrival_dt < now:
+
+    if isinstance(dep_time, timedelta):
+        total_seconds = int(dep_time.total_seconds())
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        dep_time = time(hours, minutes, seconds)
+
+    departure_dt = datetime.combine(
+        flight["Departure_Date"],
+        dep_time)
+
+    one_hour_before_departure = departure_dt - timedelta(hours=1)
+
+    if datetime.now() >= one_hour_before_departure:
         cursor.execute("""
             UPDATE Flight
             SET Status = 'Completed'
-            WHERE Flight_Number = %s
-        """, (flight_number,))
-        complete_orders_for_finished_flight(cursor, flight_number)
-        return
+            WHERE Flight_Number = %s""", (flight_number,))
+    complete_orders_for_finished_flight(cursor, flight_number)
+    return
 
     cursor.execute("""
         SELECT COUNT(*) AS total_seats
