@@ -236,3 +236,8 @@ INSERT INTO Air_Craft VALUES
 ('AC4','Small','Dassault',0,120,'2021-01-01'),
 ('AC5','Large','Airbus',25,220,'2017-01-01'),
 ('AC6','Small','Boeing',0,100,'2022-01-01');
+
+UPDATE F_Order
+SET Stat = 'Completed'
+WHERE Stat = 'Active';
+
