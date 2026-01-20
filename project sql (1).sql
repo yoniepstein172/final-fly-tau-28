@@ -1,6 +1,26 @@
-CREATE SCHEMA FLYTAU;
 
-USE FLYTAU;
+-- =============================================
+-- 1. CLEANUP: Delete old tables in correct order
+-- =============================================
+DROP TABLE IF EXISTS Order_seat;
+DROP TABLE IF EXISTS Assigned_Attendant;
+DROP TABLE IF EXISTS Assigned_Pilot;
+DROP TABLE IF EXISTS Seat;
+DROP TABLE IF EXISTS F_Order;
+DROP TABLE IF EXISTS Flight;
+DROP TABLE IF EXISTS Phone_Numbers_Registered_Customers;
+DROP TABLE IF EXISTS Phone_Numbers_NonRegistered_Customers;
+DROP TABLE IF EXISTS Air_Craft;
+DROP TABLE IF EXISTS Route;
+DROP TABLE IF EXISTS Registered_Customer;
+DROP TABLE IF EXISTS NonRegistered_Customer;
+DROP TABLE IF EXISTS Manager;
+DROP TABLE IF EXISTS Pilot;
+DROP TABLE IF EXISTS Flight_Attendant;
+
+-- =============================================
+-- 2. CREATE TABLES
+-- =============================================
 
 CREATE TABLE Flight_Attendant
 ( FA_ID VARCHAR(45) NOT NULL UNIQUE, 
@@ -143,17 +163,16 @@ PRIMARY KEY (S_Row, Letter,O_ID,AC_ID),
 foreign key (AC_ID,S_Row, Letter) references Seat(AC_ID,S_Row, Letter),
 foreign key (O_ID) references F_Order(O_ID));
 
+-- =============================================
+-- 3. INSERT DATA
+-- =============================================
 
--- =========================
--- 1) Managers (2)
--- =========================
+-- Managers
 INSERT INTO Manager VALUES
 ('M1','דנה','לוי','0501000001','2019-01-01','תל אביב','דיזנגוף',10,'pass1'),
 ('M2','רון','כהן','0501000002','2020-02-01','רמת גן','ביאליק',5,'pass2');
 
--- =========================
--- 2) Customers: 
--- =========================
+-- Customers
 INSERT INTO NonRegistered_Customer VALUES
 ('guest1@mail.com','John','Doe'),
 ('guest2@mail.com','Jane','Smith');
@@ -173,9 +192,7 @@ INSERT INTO Phone_Numbers_Registered_Customers VALUES
 ('reg2@mail.com','0509000102'),
 ('reg3@mail.com','0509000103');
 
--- =========================
--- 3) Workers: 4 pilots + 20 attendants
--- =========================
+-- Workers
 INSERT INTO Pilot VALUES
 ('P1','יואב','כהן','0503000001','2017-01-01','תל אביב','השלום',1,1),
 ('P2','רן','לוי','0503000002','2017-02-01','חולון','הרצל',2,1),
@@ -189,43 +206,4 @@ INSERT INTO Flight_Attendant VALUES
 ('FA4','נועה','רז','0502000004','2018-01-01','חולון','הרצל',4,1),
 ('FA5','אור','כהן','0502000005','2018-01-01','רמת גן','ביאליק',5,1),
 ('FA6','דנה','ברק','0502000006','2018-01-01','רמת גן','ביאליק',6,1),
-('FA7','טל','שחר','0502000007','2018-01-01','גבעתיים','כצנלסון',7,1),
-('FA8','רוני','בר','0502000008','2018-01-01','גבעתיים','כצנלסון',8,1),
-('FA9','שני','לב','0502000009','2018-01-01','חיפה','מוריה',9,1),
-('FA10','עדי','רום','0502000010','2018-01-01','חיפה','מוריה',10,1),
-('FA11','נועה','שקד','0502000011','2018-01-01','חיפה','מוריה',11,1),
-('FA12','מאיה','חן','0502000012','2018-01-01','נתניה','הרצל',12,1),
-('FA13','לירון','טל','0502000013','2018-01-01','נתניה','הרצל',13,1),
-('FA14','שירה','בן דוד','0502000014','2018-01-01','כפר סבא','ויצמן',14,1),
-('FA15','מור','אלון','0502000015','2018-01-01','כפר סבא','ויצמן',15,1),
-('FA16','איילת','כהן','0502000016','2018-01-01','רחובות','הרצל',16,1),
-('FA17','שחר','זיו','0502000017','2018-01-01','רחובות','הרצל',17,1),
-('FA18','שיר','מור','0502000018','2018-01-01','ראשון','רוטשילד',18,1),
-('FA19','נועה','זיו','0502000019','2018-01-01','ראשון','רוטשילד',19,1),
-('FA20','רוני','פלד','0502000020','2018-01-01','ראשון','רוטשילד',20,1);
-
--- =========================
--- 4) Routes
--- =========================
-INSERT INTO Route VALUES
-('R1','02:30:00','LONDON-LHR','TEL AVIV-TLV'),
-('R2','05:00:00','PARIS-CDG','TEL AVIV-TLV'),
-('R3','09:30:00','NYC-JFK','TEL AVIV-TLV'),
-('R4','04:00:00','ROME-FCO','TEL AVIV-TLV'),
-('R5','09:00:00','BANGKOK-BKK','TEL AVIV-TLV');
-
--- =========================
--- 5) Air Craft (6)
--- =========================
-INSERT INTO Air_Craft VALUES
-('AC1','Small','Boeing',0,80,'2018-01-01'),
-('AC2','Large','Airbus',20,200,'2019-01-01'),
-('AC3','Large','Boeing',30,250,'2020-01-01'),
-('AC4','Small','Dassault',0,120,'2021-01-01'),
-('AC5','Large','Airbus',25,220,'2017-01-01'),
-('AC6','Small','Boeing',0,100,'2022-01-01');
-
--- =========================
-
-
-
+('FA7','טל','
