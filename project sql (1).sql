@@ -57,14 +57,16 @@ primary key(R_Email));
 CREATE TABLE Route
 (R_ID VARCHAR(45) NOT NULL UNIQUE,
 Duration TIME NOT NULL,
-Destination VARCHAR(45),
 Airport_Source VARCHAR(45),
+Destination VARCHAR(45),
 primary key (R_ID, Duration));
 
 CREATE TABLE Air_Craft
 (AC_ID VARCHAR(45) NOT NULL UNIQUE,
 Size ENUM("Large","Small"),
 Manufactur ENUM("Boeing","Airbus","Dassault"),
+Capacity_Business INT,
+Capacity_Economy INT,
 Purchased_DATE DATE,
 primary key(AC_ID));
 
@@ -72,8 +74,8 @@ CREATE TABLE Flight
 (Flight_Number VARCHAR(45) NOT NULL UNIQUE, 
 Departure_Date DATE,
 Departure_TIME TIME,
-Status VARCHAR(45),
-Price_Econemy INT,
+Status ENUM("Active", "Full_Flight","Completed","Canceled"),
+Price_Economy INT,
 Price_Business INT, 
 R_ID VARCHAR(45),
 Duration TIME,
@@ -86,7 +88,8 @@ foreign key(AC_ID) references Air_Craft(AC_ID));
 
 CREATE TABLE F_Order
 (O_ID VARCHAR(45) NOT NULL UNIQUE,
-Stat ENUM("Active","Approved","customer_Cancelation","System_Cancelation"),
+Stat ENUM("Active","Approved","Customer_Cancelation","System_Cancelation"),
+User_Type ENUM("NonRegistered_Customers","Registered_Customers"),
 Order_Date Date,
 Price INT,
 Email VARCHAR(45),
@@ -99,12 +102,11 @@ FOREIGN KEY (Flight_Number) REFERENCES Flight(Flight_Number));
 
 CREATE TABLE Seat
 (AC_ID VARCHAR(45),
-S_ROW INT,
+S_Row INT,
 Letter CHAR(1),
 Class ENUM("Business","Economy"),
-O_ID VARCHAR(45),
-foreign key (AC_ID) references Air_Craft(AC_ID),
-foreign key (O_ID) references F_Order(O_ID));
+primary key (AC_ID,S_Row, Letter),
+foreign key (AC_ID) references Air_Craft(AC_ID));
 
 CREATE TABLE Assigned_Pilot
 (P_ID VARCHAR(45),
@@ -121,16 +123,25 @@ foreign key (FA_ID) references Flight_Attendant(FA_ID),
 foreign key(Flight_Number) references Flight( Flight_Number));
 
 CREATE TABLE Phone_Numbers_NonRegistered_Customers
-(Email VARCHAR(45) NOT NULL UNIQUE,
+(Email VARCHAR(45) NOT NULL,
 Phone_Number VARCHAR(45),
 primary key (Email, Phone_Number),
 foreign key(Email) references NonRegistered_Customer(Email));
 
 CREATE TABLE Phone_Numbers_Registered_Customers
-(R_Email VARCHAR(45) NOT NULL UNIQUE,
+(R_Email VARCHAR(45) NOT NULL,
 Phone_Number VARCHAR(45),
 primary key (R_Email, Phone_Number),
 foreign key(R_Email) references Registered_Customer(R_Email));
+
+CREATE TABLE Order_seat
+(AC_ID VARCHAR(45),
+S_Row INT,
+Letter CHAR(1),
+O_ID VARCHAR(45),
+PRIMARY KEY (S_Row, Letter,O_ID,AC_ID),
+foreign key (AC_ID,S_Row, Letter) references Seat(AC_ID,S_Row, Letter),
+foreign key (O_ID) references F_Order(O_ID));
 
 
 -- =========================
