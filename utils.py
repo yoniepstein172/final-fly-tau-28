@@ -2,6 +2,15 @@ from datetime import datetime, time, timedelta, date
 from flask import flash, redirect, session
 from functools import wraps
 
+def complete_orders_for_finished_flight(cursor, flight_number): #Move all orders from Approved → Completed once the flight date has passed
+    cursor.execute("""
+        UPDATE F_Order
+        SET Stat = 'Completed'
+        WHERE Flight_Number = %s
+          AND Stat = 'Approved'
+    """, (flight_number,))
+
+
 def get_cities(cursor): #from the db getting the cities so customer can choose
     cursor.execute("""
             SELECT DISTINCT Airport_Source AS city FROM Route
@@ -28,7 +37,7 @@ def create_seats_for_aircraft(cursor, ac_id):
     size = result["Size"]
     manufacturer = result["Manufactur"]
 
-    # ✈️ layout rules by manufacturer + size
+    #  layout rules by manufacturer + size
     layout = {
         ("Boeing", "Small"):    {"Business": 4, "Economy": 6},
         ("Boeing", "Large"):    {"Business": 6, "Economy": 8},
@@ -158,6 +167,7 @@ def update_status(cursor, flight_number):
             SET Status = 'Completed'
             WHERE Flight_Number = %s
         """, (flight_number,))
+        complete_orders_for_finished_flight(cursor, flight_number)
         return
 
     cursor.execute("""
