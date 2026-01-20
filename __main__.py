@@ -11,6 +11,14 @@ from utils import *
 app=Flask(__name__)
 app.secret_key = "flytau-secret-key"
 
+app.config.update(
+    SESSION_TYPE= 'filesystem',
+    SESSION_FILE_DIR= '/flask_session_data',
+    SESSION_PERMANENT= True,
+    PERMAMENT_SESSION_LIFETIME= timedelta(minutes=10),
+    SEESION_REFRESH_EACH_REQUEST=True,
+    SESSION_COOKEIE_SECURE=True)
+
 @app.errorhandler(404)
 def page_not_found(e):
     flash("You were redirected to the home page because the page you tried to access does not exist.", "error")
