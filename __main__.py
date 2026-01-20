@@ -5,6 +5,7 @@ from functools import wraps
 import uuid #import that will make up order id
 import math
 from datetime import date, datetime, timedelta, time
+from flask_session import Session
 from utils import *
 
 
@@ -15,9 +16,11 @@ app.config.update(
     SESSION_TYPE= 'filesystem',
     SESSION_FILE_DIR= '/flask_session_data',
     SESSION_PERMANENT= True,
-    PERMAMENT_SESSION_LIFETIME= timedelta(minutes=10),
-    SEESION_REFRESH_EACH_REQUEST=True,
-    SESSION_COOKEIE_SECURE=True)
+    PERMANENT_SESSION_LIFETIME= timedelta(minutes=10),
+    SESSION_REFRESH_EACH_REQUEST=True,
+    SESSION_COOKIE_SECURE=True)
+
+Session(app)
 
 @app.errorhandler(404)
 def page_not_found(e):
