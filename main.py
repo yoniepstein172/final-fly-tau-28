@@ -43,10 +43,10 @@ def internal_error(e):
 @contextmanager
 def db_cursor():
     conn = mdb.connect(
-        host="localhost",
-        user="root",
-        password="root",
-        database="FLYTAU")
+        host="yoniepstein.mysql.pythonanywhere-services.com",
+        user="yoniepstein",
+        password="ShRu2003",
+        database="yoniepstein$flytau28")
     cursor = conn.cursor(dictionary=True)
     try:
         yield cursor
@@ -161,7 +161,7 @@ def flight_results():
 
     with db_cursor() as cursor:
         cursor.execute("""
-            SELECT 
+            SELECT
                 F.Flight_Number,
                 R.Airport_Source,
                 R.Destination,
@@ -171,12 +171,12 @@ def flight_results():
                 F.Price_Economy,
                 F.Price_Business
             FROM Flight F
-            JOIN Route R 
+            JOIN Route R
               ON F.R_ID = R.R_ID AND F.Duration = R.Duration
             WHERE R.Airport_Source = %s
               AND R.Destination = %s
               AND F.Status = 'Active'
-              AND TIMESTAMP(F.Departure_Date, F.Departure_Time) 
+              AND TIMESTAMP(F.Departure_Date, F.Departure_Time)
                   > DATE_ADD(NOW(), INTERVAL 1 HOUR)
               AND F.Departure_Date = %s
         """, (from_city, to_city, date))
@@ -194,7 +194,7 @@ def guest_my_order():
         email = request.form["email"].strip()
 
         with db_cursor() as cursor:
-            cursor.execute("""SELECT 
+            cursor.execute("""SELECT
                     O.O_ID,
                     O.Order_Date,
                     O.Stat,
@@ -205,7 +205,7 @@ def guest_my_order():
                     R.Destination
                 FROM F_Order O
                 JOIN Flight F ON O.Flight_Number = F.Flight_Number
-                JOIN Route R ON F.R_ID = R.R_ID 
+                JOIN Route R ON F.R_ID = R.R_ID
                 WHERE O.O_ID = %s
                   AND (
                        (O.User_Type = 'NonRegistered_Customers' AND O.Email = %s)
@@ -226,7 +226,7 @@ def flight_board():
     with db_cursor() as cursor:
         update_all_flights_status(cursor)
         cursor.execute("""
-            SELECT 
+            SELECT
                 F.Flight_Number,
                 R.Airport_Source,
                 R.Destination,
@@ -254,7 +254,7 @@ def customer_home():
     status = request.args.get("status")
 
     query = """
-        SELECT 
+        SELECT
             O.O_ID,
             O.Order_Date,
             O.Stat,
@@ -268,7 +268,7 @@ def customer_home():
         JOIN Route R ON F.R_ID = R.R_ID AND F.Duration = R.Duration
         WHERE( O.R_Email = %s AND O.User_Type = 'Registered_Customers')
         OR (O.User_Type = 'NonRegistered_Customers' AND O.Email = %s)
-        
+
     """
 
     params = [email,email]
@@ -412,7 +412,7 @@ def order_summary(flight_number):
     with db_cursor() as cursor:
         # Flight info
         cursor.execute("""
-            SELECT 
+            SELECT
                 F.Flight_Number,
                 R.Airport_Source,
                 R.Destination,
@@ -1103,7 +1103,7 @@ def search_board():
     status = request.form.get("status")
 
     query = """
-        SELECT 
+        SELECT
             F.Flight_Number,
             R.Airport_Source,
             R.Destination,
@@ -1235,7 +1235,7 @@ def manager_reports():
         # 1. Revenue by Month
         # =========================
         revenue_query = """
-            SELECT 
+            SELECT
                 YEAR(Order_Date) AS year,
                 MONTH(Order_Date) AS month,
                 SUM(Price) AS total_revenue,
@@ -1262,7 +1262,7 @@ def manager_reports():
         # 2. Popular Routes
         # =========================
         popular_routes_query = """
-            SELECT 
+            SELECT
                 R.Airport_Source,
                 R.Destination,
                 COUNT(O.O_ID) AS orders_count
@@ -1292,7 +1292,7 @@ def manager_reports():
         # 3. Cancellations Report
         # =========================
         cancel_query = """
-            SELECT 
+            SELECT
                 YEAR(Order_Date) AS year,
                 MONTH(Order_Date) AS month,
                 COUNT(*) AS canceled_orders
@@ -1314,7 +1314,7 @@ def manager_reports():
         # 4. Orders by User Type
         # =========================
         user_type_query = """
-            SELECT 
+            SELECT
                 User_Type,
                 COUNT(*) AS orders_count
             FROM F_Order
@@ -1334,14 +1334,14 @@ def manager_reports():
         # 5. Seat Utilization
         # =========================
         seat_query = """
-            SELECT 
+            SELECT
                 F.Flight_Number,
                 COUNT(OS.S_Row) AS taken_seats,
                 COUNT(S.S_Row) AS total_seats,
                 ROUND(COUNT(OS.S_Row) / COUNT(S.S_Row) * 100, 1) AS utilization_percent
             FROM Flight F
             JOIN Seat S ON S.AC_ID = F.AC_ID
-            LEFT JOIN Order_Seat OS
+            LEFT JOIN Order_seat OS
               ON OS.AC_ID = S.AC_ID
              AND OS.S_Row = S.S_Row
              AND OS.Letter = S.Letter
@@ -1380,7 +1380,7 @@ def cancel_order(order_id):
 
     with db_cursor() as cursor:
         cursor.execute("""
-            SELECT 
+            SELECT
                 O.O_ID,
                 O.Price,
                 O.Stat,
@@ -1393,7 +1393,7 @@ def cancel_order(order_id):
         """, (order_id,))
         order = cursor.fetchone()
 
-        if not order or order["Stat"] not in ("Approved", "Completed"):
+        if not order or order["Stat"] not in ("Approved"):
             flash("This order cannot be canceled.", "error")
             return redirect("/")
 
@@ -1421,7 +1421,7 @@ def cancel_order(order_id):
         """, (new_price, order_id))
 
         cursor.execute("""
-            DELETE FROM Order_Seat
+            DELETE FROM Order_seat
             WHERE O_ID = %s
         """, (order_id,))
 
@@ -1431,6 +1431,8 @@ def cancel_order(order_id):
             return redirect("/customer/home")
         else:
             return redirect("/guest/my-order")
+
+
 
 if __name__=="__main__":
     app.run(debug=True)
