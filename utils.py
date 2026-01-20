@@ -134,7 +134,7 @@ def build_seats(capacity, letters, seat_class, start_row):
     return seats
 
 
-def update_status(cursor, flight_number):
+def update_status(cursor, flight_number): #update flight status after date has passed
 
     cursor.execute("""
         SELECT Status,Departure_Date,Departure_Time, Arrival_Date, Arrival_Time, AC_ID
@@ -207,7 +207,7 @@ def update_all_flights_status(cursor):
         for f in flights:
             update_status(cursor, f["Flight_Number"])
 
-def check_valid_date(dep_date, dep_time):
+def check_valid_date(dep_date, dep_time): 
 
     if isinstance(dep_date, str):
         dep_date = datetime.strptime(dep_date, "%Y-%m-%d").date()
@@ -218,7 +218,7 @@ def check_valid_date(dep_date, dep_time):
     dep_datetime = datetime.combine(dep_date, dep_time)
     return dep_datetime <= datetime.now()
 
-def block_manager(f):
+def block_manager(f): #in use in any route not under manager features
     @wraps(f)
     def wrapper(*args, **kwargs):
         if session.get("role") == "manager":
@@ -230,7 +230,7 @@ def block_manager(f):
     return wrapper
 
 
-def login_required(role=None):
+def login_required(role=None): #in use in any route required logging in
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
