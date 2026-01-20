@@ -444,7 +444,7 @@ def order_summary(flight_number): #order summary - for customer to confirm
         business_count=business_count,
         total_price=total_price)
 
-@app.route("/Confirmation")
+@app.route("/Confirmation") #when clicking confirmation on summary page redirect by user type
 @block_manager
 def confirmation(): 
     role = session.get("role")
@@ -589,8 +589,8 @@ def purchase():
 
         return redirect("/order-confirmation")
 
-@app.route("/order-confirmation")
-@block_manager #order is made and confirmed with order id
+@app.route("/order-confirmation") #order is made and confirmed with order id
+@block_manager 
 def order_confirmation():
     order_id = session.get("order_id")
     customer_name = session.get("customer_name")
