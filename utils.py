@@ -179,7 +179,7 @@ def update_status(cursor, flight_number):
 
     cursor.execute("""
         SELECT COUNT(*) AS taken_seats
-        FROM Order_Seat OS
+        FROM Order_seat OS
         JOIN F_Order O ON O.O_ID = OS.O_ID
         WHERE O.Flight_Number = %s
           AND O.Stat IN ('Approved','Active')
