@@ -14,7 +14,7 @@ app.secret_key = "flytau-secret-key"
 
 app.config.update(
     SESSION_TYPE= 'filesystem',
-    SESSION_FILE_DIR= '/flask_session_data',
+    SESSION_FILE_DIR= '/home/yoniepstein/final-fly-tau-28/flask_session_data',
     SESSION_PERMANENT= True,
     PERMANENT_SESSION_LIFETIME= timedelta(minutes=10),
     SESSION_REFRESH_EACH_REQUEST=True,
