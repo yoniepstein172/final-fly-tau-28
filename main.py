@@ -112,10 +112,7 @@ def login():
             """, (identifier, password))
             manager = cursor.fetchone()
 
-            if manager: #saving user type
-                session["user"] = identifier
-                session["role"] = "manager"
-                return redirect("/manager/home")
+
 
             cursor.execute("""
                 SELECT *
