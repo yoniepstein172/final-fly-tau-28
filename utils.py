@@ -1,6 +1,8 @@
 from datetime import datetime, time, timedelta, date
 from flask import flash, redirect, session
 from functools import wraps
+from zoneinfo import ZoneInfo #israel time zone
+
 
 def complete_orders_for_finished_flight(cursor, flight_number): #Move all orders from Approved → Completed once the flight date has passed
     cursor.execute("""
@@ -135,7 +137,7 @@ def build_seats(capacity, letters, seat_class, start_row):
 
 
 def update_status(cursor, flight_number): #update flight status after date has passed
-
+    now_in_israel= datetime.now(ZoneInfo("Asia/Jerusalem")).replace(tzinfo=None)
     cursor.execute("""
         SELECT Status,Departure_Date,Departure_Time, Arrival_Date, Arrival_Time, AC_ID
         FROM Flight
@@ -172,13 +174,13 @@ def update_status(cursor, flight_number): #update flight status after date has p
 
     one_hour_before_departure = departure_dt - timedelta(hours=1)
 
-    if datetime.now() >= one_hour_before_departure:
+     if now_in_israel >= one_hour_before_departure:
         cursor.execute("""
             UPDATE Flight
             SET Status = 'Completed'
             WHERE Flight_Number = %s""", (flight_number,))
-    complete_orders_for_finished_flight(cursor, flight_number)
-    return
+        complete_orders_for_finished_flight(cursor, flight_number)
+        return
 
     cursor.execute("""
         SELECT COUNT(*) AS total_seats
