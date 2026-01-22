@@ -1,6 +1,6 @@
 # FLY-TAU-28
-FLYTAU - Airline Flight Management & Ticketing System
-**OVERVIEW**
+FLYTAU - Airline Flight Management & Ticketing System<br>
+<br>
 The FLYTAU Information System is a web-based airline platform that allows customers to search and purchase flight tickets, and enables managers to control operational activities such as flight creation, cancellation, and staff assignment.
 
 This README describes the functionality, user flows, technology stack, and deployment instructions for the web application.
@@ -12,6 +12,7 @@ This README describes the functionality, user flows, technology stack, and deplo
 Available to both guest users and registered customers:
 
 - Search flights by date, origin, and destination
+- View the Airline flight-board
 - View available seats per flight
 - Purchase tickets and complete orders
 - Receive a unique order code for later retrieval
@@ -20,7 +21,7 @@ Available to both guest users and registered customers:
 
 Registered customers additionally can:
 - Log in with email + password
-- Automatically fill personal details when ordering
+- Our service will automatically fill personal details when ordering
 - View full order history with status filtering
 
 **Manager / Admin Interface**
@@ -31,7 +32,7 @@ Accessible to system managers after login:
 - Create new routes
 - Assign aircraft and crew
 - Cancel existing flights
-- View all flight board 
+- View all flight board with status, date, airport source and airport destination filtering
 - View operational statistics & business reports
 - Add pilots and attendants (as employees)
 - Add purchased aricrafts
@@ -50,13 +51,14 @@ The system supports three types of users:
 
 - Managers cannot purchase tickets
 - Guests and registered customers may cancel orders
-- Order cancellation up to 36 hours before flight refunds 95% of the original cost (5% fee)
+- Order cancellation up to 36 hours before flight refunds 95% of the original cost (5% fee) else, 100% fee
 - Flight cancellation by manager triggers full refund
 - Long flights (>6h) require certified crew
 - Aircraft size determines seat classes and crew size
-- Flight cannot be created if no aircraft or crew is available
+- Flight cannot be created if no aircraft or crew are available
 - Aircraft types: Boeing / Airbus / Dassault
 - Aircraft sizes: Small / Large
+
 
 
 ### MAIN USER FLOWS
@@ -89,7 +91,7 @@ The system supports three types of users:
 Common screens include:
 
 - Flight search page - guest and registered
-- Flight board - for costumers, only active flights
+- Flight board - for costumers (guest and registered), only active flights
 - Seat selection page
 - Order summary page
 - Order confirmation page
