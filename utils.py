@@ -173,8 +173,7 @@ def update_status(cursor, flight_number): #update flight status after date has p
         dep_time)
 
     one_hour_before_departure = departure_dt - timedelta(hours=1)
-
-     if now_in_israel >= one_hour_before_departure:
+    if now_in_israel >= one_hour_before_departure:
         cursor.execute("""
             UPDATE Flight
             SET Status = 'Completed'
