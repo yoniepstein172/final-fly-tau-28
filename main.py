@@ -1,8 +1,8 @@
-from flask import Flask, request, redirect,session, render_template, flash
+from flask import Flask, request, redirect, session, render_template, flash
 import mysql.connector as mdb
 from contextlib import contextmanager
 from functools import wraps
-import uuid #import that will make up order id
+import uuid #import that will make up id's- order, flight, route, etc
 import math
 from datetime import date, datetime, timedelta, time
 from flask_session import Session
@@ -11,7 +11,7 @@ from utils import *
 
 app=Flask(__name__)
 app.secret_key = "flytau-secret-key"
-
+#adding session file for cookies
 app.config.update(
     SESSION_TYPE= 'filesystem',
     SESSION_FILE_DIR= '/home/yoniepstein/final-fly-tau-28/flask_session_data',
@@ -59,7 +59,7 @@ def db_cursor():
         cursor.close()
         conn.close()
 
-@app.route("/") #home page, customer clicking if in registered/not
+@app.route("/") #home page, customer entering their wanted title: guest/new customer: register/ returning new customer: log in
 def index():
     return render_template("index.html")
 
@@ -97,7 +97,7 @@ def register():
 
     return render_template("register.html",today=date.today()) #if method=get
 
-@app.route("/login", methods=["GET", "POST"]) #login - available if users who are not managers
+@app.route("/login", methods=["GET", "POST"]) #login - available for Registered_Customers
 @block_manager
 def login():
     if request.method == "POST":
@@ -138,7 +138,7 @@ def logout():
     flash("You have been logged out successfully.", "success")
     return redirect("/")
 
-@app.route("/guest") #if customer ig only guest #continue as guest - if no manager
+@app.route("/guest") #if customer wants to enter as guest- saves user type and redirect to guest page
 @block_manager 
 def guest_login():
     session["role"] = "guest" #saving user type
@@ -146,12 +146,13 @@ def guest_login():
 
 
 
-@app.route("/choose-flights") #entering wanted details of flight
+@app.route("/choose-flights") #guest can search for flight as he wishes; by date, source and destination 
 @block_manager
 def choose_flight():
     with db_cursor() as cursor:
-        cities = get_cities(cursor)
+        cities = get_cities(cursor) #guest can choose from cities we have flights to and from, according to DB
     return render_template("choose_flights.html", cities=cities)
+    
 @app.route("/flights-results")
 @block_manager
 def flight_results():
@@ -160,7 +161,7 @@ def flight_results():
     from_city = request.args.get("from_city")
     to_city = request.args.get("to_city")
 
-    with db_cursor() as cursor:
+    with db_cursor() as cursor: # presenting all flights we have according to the search, you can order a flight up to one hour before departure 
         cursor.execute("""
             SELECT
                 F.Flight_Number,
@@ -244,10 +245,10 @@ def flight_board():
 
     return render_template("flight_board.html", flights=flights)
 
-@app.route("/customer/home")
+@app.route("/customer/home") #homepage for registered customer, can see all orders and can order a new flight
 @block_manager
-@login_required("customer")
-def customer_home(): #homepage for registered costumer, can see all orders and can order a new flight
+@login_required("customer") 
+def customer_home(): 
     with db_cursor() as cursor:
         update_all_flights_status(cursor)
     email = session["user"]
@@ -270,7 +271,6 @@ def customer_home(): #homepage for registered costumer, can see all orders and c
         OR (O.User_Type = 'NonRegistered_Customers' AND O.Email = %s)
 
     """
-
     params = [email,email]
 
     if status:
@@ -289,9 +289,9 @@ def customer_home(): #homepage for registered costumer, can see all orders and c
         selected_status=status)
 
 
-@app.route("/flight/<flight_number>/seats", methods=["GET", "POST"])
+@app.route("/flight/<flight_number>/seats", methods=["GET", "POST"])#selecting seats in aircraft drawing, dividing into taken seats and free seats
 @block_manager
-def seat_selection(flight_number): #selecting seats in aircraft drawing, deviding into taken seats and free seats
+def seat_selection(flight_number): 
 
     if session.get("current_flight") != flight_number:
         session["current_flight"] = flight_number
@@ -402,9 +402,9 @@ def seat_selection(flight_number): #selecting seats in aircraft drawing, devidin
         economy_rows=economy_rows)
 
 
-@app.route("/flight/<flight_number>/order-summary", methods=["GET"])
+@app.route("/flight/<flight_number>/order-summary", methods=["GET"]) #order summary - for customer to confirm
 @block_manager
-def order_summary(flight_number): #order summary - for customer to confirm
+def order_summary(flight_number): 
     selected_seats = session.get("selected_seats", [])
     if not selected_seats:
         return redirect(f"/flight/{flight_number}/seats")
@@ -456,12 +456,13 @@ def confirmation():
 @app.route("/guest-details", methods=["GET", "POST"]) #entering guest details to save new order
 @block_manager
 def guest_details(): 
-    #checking if guest already oredered in past
     if request.method == "POST":
         first_name = request.form["first_name"]
         last_name = request.form["last_name"]
         email = request.form["email"]
         phones = request.form.getlist("phones[]")
+        
+        #checking if the guest already ordered in the past
         with db_cursor() as cursor:
             cursor.execute("""
                             SELECT 1
@@ -469,7 +470,7 @@ def guest_details():
                             WHERE Email = %s
                         """, (email,))
             exists = cursor.fetchone()
-            #if guest didn't order in the past insert into DB
+            #if guest didn't order in the past, insert into DB
             if not exists: 
                 cursor.execute("""
                      INSERT INTO NonRegistered_Customer
@@ -512,7 +513,7 @@ def purchase():
     with (db_cursor() as cursor):
         order_id = str(uuid.uuid4())
 
-        if role == "customer": #if registered entering to DB new oreder with customer deatils
+        if role == "customer": #if registered customer ordered: insert to DB new order with customer details
             email = session["user"]
 
             cursor.execute("""
@@ -520,7 +521,9 @@ def purchase():
                 (O_ID, Stat, Order_Date, Price, User_Type, R_Email, Flight_Number)
                 VALUES (%s, 'Approved', CURDATE(), %s, 'Registered_Customers', %s, %s)
             """, (order_id, session["total_price"], email, flight_number))
-        else: #guest -either info is set from previous order or redirecting to fill details
+            
+        else: #if guest ordered: if new guest redirecting to fill details, else adding to NonRegistered_Customer details
+            
             guest = session.get("guest_info")
             if not guest:
                 return redirect("/guest-details")
@@ -531,8 +534,8 @@ def purchase():
                 FROM NonRegistered_Customer
                 WHERE Email = %s
             """, (guest["email"],))
-
             exists = cursor.fetchone()
+            
             if not exists:
                 cursor.execute("""
                     INSERT INTO NonRegistered_Customer
@@ -560,7 +563,7 @@ def purchase():
                 VALUES (%s, 'Approved', CURDATE(), %s, 'NonRegistered_Customers', %s, %s)
             """, (order_id, session["total_price"], guest["email"], flight_number))
 
-
+#saving customer wanted seats
         for seat in selected_seats:
             cursor.execute(
                 "SELECT COUNT(*) AS cnt FROM Seat WHERE AC_ID = %s",
@@ -589,7 +592,7 @@ def purchase():
 
         return redirect("/order-confirmation")
 
-@app.route("/order-confirmation") #order is made and confirmed with order id
+@app.route("/order-confirmation") #order is confirmed with order id
 @block_manager 
 def order_confirmation():
     order_id = session.get("order_id")
@@ -604,8 +607,8 @@ def order_confirmation():
         customer_name=customer_name)
 
 
-@app.route("/manager-login", methods=["GET", "POST"])
-def manager_login(): #manager log in with id and password from DB
+@app.route("/manager-login", methods=["GET", "POST"]) #manager log in with id and password from DB
+def manager_login(): 
     if request.method == "POST":
         manager_id = request.form["manager_id"]
         password = request.form["password"]
@@ -618,12 +621,12 @@ def manager_login(): #manager log in with id and password from DB
             """, (manager_id, password))
 
             manager = cursor.fetchone()
-
         if manager:
             session.clear()
             session["user"] = manager_id
             session["role"] = "manager"
             return redirect("/manager/home")
+            
         return render_template("manager_login.html",error="Invalid manager ID or password")
     return render_template("manager_login.html",error="Invalid manager credentials")
 
@@ -636,9 +639,10 @@ def manager_home():
 @app.route("/manager/add-flight", methods=["GET", "POST"])
 @login_required("manager")
 def add_flight():
+    #this function is divided into steps:
     step = request.form.get("step", "1")
 
-    with db_cursor() as cursor: #first step = entering route from DB
+    with db_cursor() as cursor: #showing all kinds of routes from DB so manager can choose from possible routes
         if request.method == "GET":
             cursor.execute("""
                 SELECT R_ID, Airport_Source, Destination, Duration
@@ -650,15 +654,16 @@ def add_flight():
             return render_template("manager_add_flight.html",step="1",routes=routes)
 
         if step == "1":
-
+#after the manager has chosen the wanted route, date, and time
             r_id = request.form["r_id"]
-            dep_date = request.form["departure_date"]      # yyyy-mm-dd
-            dep_time = request.form["departure_time"]      # HH:MM
+            dep_date = request.form["departure_date"]      
+            dep_time = request.form["departure_time"]      
 
-            if check_valid_date(dep_date, dep_time): #flight in future
+            if check_valid_date(dep_date, dep_time): #cheecking if choosen date is valid
                 flash("You cannot create a flight in the past.", "error")
                 return redirect("/manager/add-flight")
-            # Route info
+                
+            # chosen Route info
             cursor.execute("""
                 SELECT Airport_Source, Destination, Duration
                 FROM Route
@@ -666,7 +671,7 @@ def add_flight():
             """, (r_id,))
             route = cursor.fetchone()
 
-            duration = route["Duration"]  # TIME
+            duration = route["Duration"]  # saving flight duration
             dep_datetime = datetime.strptime(
                 f"{dep_date} {dep_time}", "%Y-%m-%d %H:%M" )
 
@@ -681,7 +686,7 @@ def add_flight():
             long_flight = hours > 6
             need_qualified= 1 if long_flight else 0
 
-#making sure only availble aircrafts will be showen - qualification, time and airport are considered
+#making sure only availble aircrafts will be shown - qualification, time, and airport are considered
             aircraft_query = """
             SELECT AC.*
             FROM Air_Craft AC
@@ -762,8 +767,7 @@ def add_flight():
 
             min_rest_date =dep_datetime.date() - timedelta(days=5)
 
-#making sure only availble pilots will be showen - qualification, time and airport are considered
-            # pilots
+#making sure only available pilots will be shown - qualification, time, and airport are considered
             cursor.execute("""
             SELECT P.*
             FROM Pilot P
@@ -830,8 +834,7 @@ def add_flight():
             ))
             pilots = cursor.fetchall()
 
-            #making sure only availble attendents will be showen - qualification, time and airport are considered
-            # attendants
+            #making sure only available attendents will be shown - qualification, time ,and airport are considered
             cursor.execute("""
             SELECT FA.*
             FROM Flight_Attendant FA
@@ -887,9 +890,7 @@ AND (
                 AND TIMESTAMP(F2.Departure_Date, F2.Departure_TIME) > %s
           )
     )
-)
-
-            """, (
+)""", (
                 need_qualified,
                 rest_before,
                 rest_after,
@@ -913,19 +914,20 @@ AND (
                 pilots=pilots,
                 attendants=attendants)
 
-        if step == "2": 
+        if step == "2": #saving in DB
             duration = request.form["duration"]
             flight_number = str(uuid.uuid4())
             r_id = request.form["r_id"]
             ac_id = request.form["ac_id"]
-            # get aircraft size
+            
+            #get aircraft size
             cursor.execute("""
                 SELECT Size
                 FROM Air_Craft
                 WHERE AC_ID = %s
             """, (ac_id,))
             aircraft = cursor.fetchone()
-
+#making sure the crew was selected according to the rules
             if aircraft["Size"] == "Large":
                 pilot_count = 3
                 fa_count = 6
@@ -942,9 +944,10 @@ AND (
                 WHERE AC_ID = %s
             """, (ac_id,))
             aircraft = cursor.fetchone()
-            price_economy = int(request.form["price_economy"]) #entering price
+            
+            price_economy = int(request.form["price_economy"]) #entering price 
             if aircraft["Capacity_Business"] == 0:
-                price_business = 0 #if no business - no bisuness price
+                price_business = 0 #if no business - no business price
             else:
                 price_business = int(request.form["price_business"])
 
@@ -977,14 +980,14 @@ AND (
                 price_business
             ))
 
-            # Assign pilots
+            # inserting in to Assign pilots table
             for p in pilots:
                 cursor.execute("""
                     INSERT INTO Assigned_Pilot ( P_ID,Flight_Number)
                     VALUES (%s,%s)
                 """, (p,flight_number))
 
-            # Assign attendants
+            # inserting in to Assign attendants table
             for fa in attendants:
                 cursor.execute("""
                     INSERT INTO Assigned_Attendant (FA_ID,Flight_Number)
@@ -1006,7 +1009,7 @@ def add_route():
         airport_source = request.form["airport_source"]
         destination = request.form["destination"]
         try:
-            with db_cursor() as cursor:
+            with db_cursor() as cursor: #adding to DB
                 cursor.execute("""
                     INSERT INTO Route (R_ID, Duration, Airport_Source, Destination)
                     VALUES (%s, %s, %s, %s)
@@ -1055,7 +1058,8 @@ def cancel_flight():
             now=datetime.now()
             if dep_datetime - now < timedelta(hours=72):
                 error = "Flights can only be canceled at least 72 hours before departure."
-            else:
+                
+            else: #if everything according to rules update DB
                 cursor.execute("""
                     UPDATE Flight
                     SET Status = 'Canceled'
@@ -1098,7 +1102,7 @@ def cancel_flight():
 @login_required("manager")
 def search_board():
     flights = []
-
+#if manager filterd acording to one of the below 
     source = request.form.get("source")
     destination = request.form.get("destination")
     date = request.form.get("date")
@@ -1233,9 +1237,9 @@ def manager_reports():
 
     with db_cursor() as cursor:
 
-        # =========================
-        # 1. Revenue by Month
-        # =========================
+
+        # Revenue by Month
+
         revenue_query = """
             SELECT
                 YEAR(Order_Date) AS year,
@@ -1260,9 +1264,7 @@ def manager_reports():
         cursor.execute(revenue_query, params)
         revenue_report = cursor.fetchall()
 
-        # =========================
-        # 2. Popular Routes
-        # =========================
+        #  Popular Routes
         popular_routes_query = """
             SELECT
                 R.Airport_Source,
@@ -1290,9 +1292,7 @@ def manager_reports():
         cursor.execute(popular_routes_query, params)
         popular_routes = cursor.fetchall()
 
-        # =========================
-        # 3. Cancellations Report
-        # =========================
+        #  Cancellations Report
         cancel_query = """
             SELECT
                 YEAR(Order_Date) AS year,
@@ -1312,9 +1312,8 @@ def manager_reports():
         cursor.execute(cancel_query, params)
         cancellations_report = cursor.fetchall()
 
-        # =========================
-        # 4. Orders by User Type
-        # =========================
+
+        # Orders by User Type
         user_type_query = """
             SELECT
                 User_Type,
@@ -1332,9 +1331,8 @@ def manager_reports():
         cursor.execute(user_type_query, params)
         orders_by_user_type = cursor.fetchall()
 
-        # =========================
-        # 5. Seat Utilization
-        # =========================
+
+        # Seat Utilization
         seat_query = """
             SELECT
                 F.Flight_Number,
