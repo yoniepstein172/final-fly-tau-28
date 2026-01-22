@@ -361,14 +361,11 @@ color: #4a5568;
 }
 
 .status.canceled,
+.status.system_cancelation,
 .status.customer_cancelation {
 color: #9b1c1c;
 }
 
-.status.canceled,
-.status.system_cancelation {
-color: #9b1c1c;
-}
 
 /* ביטול */
 .cancel-button {
