@@ -984,26 +984,7 @@ transform: translateY(-1px);
   justify-content: center;
 }
 
-/* הכפתור עצמו */
-.secondary-button {
-  padding: 10px 22px;
-  border-radius: 18px;
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
 
-  color: #2b6cb0;
-  background: #edf6ff;
-  border: 1.5px solid #cbdaf0;
-
-  box-shadow: 0 8px 20px rgba(0, 90, 180, 0.12);
-  transition: all 0.25s ease;
-}
-
-.secondary-button:hover {
-  background: #e2f0ff;
-  transform: translateY(-1px);
-}
 
 /* וריאציה שקטה יותר */
 .secondary-button.outline {
