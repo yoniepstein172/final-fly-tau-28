@@ -11,21 +11,12 @@
     </div>
     <form method="get" class="search-form" style="margin-bottom: 20px;">
     <select name="status" class="form-input">
-        <option value="">All Orders</option>
-        <option value="Approved"
-            {% if selected_status == 'Approved' %}selected{% endif %}>
-            Approved
-        </option>
-        <option value="Active"
-            {% if selected_status == 'Active' %}selected{% endif %}>
-            Active
-        </option>
-        <option value="Customer_Cancelation"
-            {% if selected_status == 'Customer_Cancelation' %}selected{% endif %}>
-            Canceled
-        </option>
-    </select>
-
+    <option value="">All Orders</option>
+    <option value="Approved" {% if selected_status == 'Approved' %}selected{% endif %}>Approved</option>
+    <option value="Completed" {% if selected_status == 'Completed' %}selected{% endif %}>Completed</option>
+    <option value="Customer_Cancelation" {% if selected_status == 'Customer_Cancelation' %}selected{% endif %}>Canceled</option>
+</select>
+        
     <button type="submit" class="action-box small">
         Filter
     </button>
