@@ -267,8 +267,8 @@ def customer_home():
         FROM F_Order O
         JOIN Flight F ON O.Flight_Number = F.Flight_Number
         JOIN Route R ON F.R_ID = R.R_ID AND F.Duration = R.Duration
-        WHERE( O.R_Email = %s AND O.User_Type = 'Registered_Customers')
-        OR (O.User_Type = 'NonRegistered_Customers' AND O.Email = %s)
+        WHERE( (O.R_Email = %s AND O.User_Type = 'Registered_Customers')
+        OR (O.User_Type = 'NonRegistered_Customers' AND O.Email = %s))
 
     """
     params = [email,email]
